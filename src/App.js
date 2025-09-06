@@ -1,5 +1,10 @@
 jsx
+// src/App.js
 import React, { useState, useEffect } from 'react';
+import fetchPosts from './api/api';
+import PostList from './components/PostList';
+import LoadingIndicator from './components/LoadingIndicator';
+import ErrorMessage from './components/ErrorMessage';
 
 function App() {
   const [data, setData] = useState([]);
@@ -7,34 +12,29 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then(response => response.json())
-      .then(data => {
+    fetchPosts()
+      .then((data) => {
         setData(data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error.message);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorMessage error={error} />;
   }
 
   return (
     <div>
       <h1>Posts</h1>
-      <ul>
-        {data.map(post => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
+      <PostList posts={data} />
     </div>
   );
 }
